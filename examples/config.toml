@@ -1,0 +1,48 @@
+# mdvim configuration — copy to ~/.config/mdvim/config.toml
+# Every key is optional. Run mdvim with `-u NONE` to ignore the config.
+
+# Key used for <leader> in mappings (default: space).
+leader = " "
+
+[options]
+number = true
+relativenumber = false
+wrap = true             # soft-wrap long lines
+linebreak = true        # wrap at word boundaries
+tabstop = 4
+shiftwidth = 4
+expandtab = true
+scrolloff = 3
+ignorecase = true
+smartcase = true
+hlsearch = true
+incsearch = true
+textwidth = 80          # used by gq / gw
+preview = true          # markdown live preview (toggle per window with :preview)
+headingscale = true     # real large headings on terminals with kitty text sizing
+cursorline = false
+timeoutlen = 1000       # ms to wait for a multi-key mapping
+splitbelow = false
+splitright = false
+mouse = true
+clipboard = false       # true: unnamed register uses the system clipboard
+
+# Mappings are non-recursive (like nnoremap). Use vim key notation.
+[keymaps.normal]
+"<leader>w" = ":w<CR>"
+"<leader>p" = ":preview<CR>"
+"<C-s>" = ":w<CR>"
+
+[keymaps.insert]
+"jk" = "<Esc>"
+
+[keymaps.visual]
+"<leader>y" = "\"+y"
+
+# Highlight groups: fg/bg accept names ("blue", "lightmagenta"), hex ("#ff79c6")
+# or 0-255 palette indices; plus bold/italic/underline/dim/reversed/strikethrough.
+[theme]
+h1 = { fg = "#ff79c6", bold = true, underline = true }
+h2 = { fg = "#bd93f9", bold = true }
+code = { fg = "#f1fa8c", bg = "236" }
+link = { fg = "#8be9fd", underline = true }
