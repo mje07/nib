@@ -642,10 +642,10 @@ fn scaled_headings_layout() {
     let tr = e.text_rect(e.win_id());
     let (_, p) = e.screen_to_pos(tr.x + 4, tr.y + 3).unwrap();
     assert_eq!(p.line, 1);
-    // Turning the option off falls back to decorated headings.
+    // Turning the option off: plain-size headings, styled by weight only.
     feed(&mut e, ":set noheadingscale<CR>");
     let views = e.layout_window(e.win_id());
     assert!(views[0].scale.is_none());
-    assert_eq!(views[0].rl.cells.iter().map(|c| c.ch).collect::<String>(), "B I G");
-    assert_eq!(views[0].height(), 2, "text row + heavy rule");
+    assert_eq!(views[0].rl.cells.iter().map(|c| c.ch).collect::<String>(), "Big");
+    assert_eq!(views[0].height(), 1);
 }

@@ -37,6 +37,8 @@ pub mod flags {
     pub const MARKUP: u32 = 1 << 18;
     pub const HR: u32 = 1 << 19;
     pub const QUOTEBAR: u32 = 1 << 21;
+    /// Obsidian `#tag`.
+    pub const TAG: u32 = 1 << 20;
     pub const TABLEBORDER: u32 = 1 << 22;
     pub const HEADING_SHIFT: u32 = 24;
     pub const HEADING_MASK: u32 = 0b111 << HEADING_SHIFT;
@@ -100,7 +102,8 @@ struct Frame {
     children: Vec<Range<usize>>,
 }
 
-const BULLETS: [&str; 3] = ["•", "◦", "▪"];
+// Obsidian uses the same bullet at every depth.
+const BULLETS: [&str; 1] = ["•"];
 
 impl MdDoc {
     pub fn parse(text: &str) -> MdDoc {
@@ -290,6 +293,7 @@ impl MdDoc {
                     if !in_code {
                         self.highlights(&r);
                         self.escapes(&r);
+                        self.tags(&r);
                     }
                     if let Some(f) = frames.last_mut() {
                         f.children.push(r);
@@ -517,6 +521,22 @@ impl MdDoc {
                 self.add(r.start + b..r.start + b + 2, MARKUP);
             }
             search = b + 2;
+        }
+    }
+
+    /// Obsidian tags: `#word` preceded by whitespace (or a text-run start),
+    /// containing at least one non-digit.
+    fn tags(&mut self, r: &Range<usize>) {
+        static RE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
+        let re = RE.get_or_init(|| regex::Regex::new(r"(?:^|[\s(])(#[\p{L}\p{N}_/-]*[\p{L}_/-][\p{L}\p{N}_/-]*)").unwrap());
+        let s = self.text[r.clone()].to_string();
+        let at_line_start = r.start == 0 || matches!(self.text.as_bytes()[r.start - 1], b'\n' | b' ' | b'\t' | b'(');
+        for cap in re.captures_iter(&s) {
+            let m = cap.get(1).unwrap();
+            if m.start() == 0 && !at_line_start {
+                continue;
+            }
+            self.add(r.start + m.start()..r.start + m.end(), TAG);
         }
     }
 

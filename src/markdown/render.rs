@@ -273,12 +273,20 @@ mod tests {
     #[test]
     fn lists_tasks_quotes() {
         assert_eq!(prev("- item", 0), "• item");
-        assert_eq!(prev("- a\n  - b", 1), "  ◦ b");
+        assert_eq!(prev("- a\n  - b", 1), "  • b");
         assert_eq!(prev("- [ ] todo", 0), "☐ todo");
         assert_eq!(prev("- [x] done", 0), "☑ done");
         assert_eq!(prev("1. one", 0), "1. one");
         assert_eq!(prev("> quoted", 0), "▎ quoted");
         assert_eq!(prev("> > nested", 0), "▎ ▎ nested");
+    }
+
+    #[test]
+    fn tags() {
+        let doc = MdDoc::parse("see #todo and #2024 x#no (#yes)");
+        let tagged: String = doc.text.char_indices().filter(|(b, _)| doc.flags[*b] & TAG != 0).map(|(_, c)| c).collect();
+        assert_eq!(tagged, "#todo#yes");
+        assert_eq!(MdDoc::parse("#tag").kinds[0], LineKind::Normal, "#tag is not a heading");
     }
 
     #[test]

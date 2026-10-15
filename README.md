@@ -29,18 +29,19 @@ mdvim --dump-render file.md --width 80    # print the rendered view (debugging)
 
 | Markdown | Rendered as |
 |---|---|
-| `# Heading` … `######` | larger, coloured headings (see *Heading sizes*) |
+| `# Heading` … `######` | bold headings, larger where supported (see *Heading sizes*) |
 | `**bold**` `*italic*` `~~strike~~` `==highlight==` | styled text, markers hidden |
 | `` `code` `` | code-coloured text |
 | `[text](url)`, `<https://…>` | underlined link text only |
 | `![alt](img.png)` | `🖼 alt` |
-| `- item` (nested) | `•`, `◦`, `▪` |
+| `- item` (nested) | muted `•` at every depth |
 | `- [ ]` / `- [x]` | ☐ / ☑ (done items dimmed and struck through) |
 | `> quote` | `▎` bar, italic text |
 | fenced code | shaded block with a language label |
 | tables | aligned columns with `│ ┼ ─` borders |
 | `---` | full-width rule |
 | footnotes `[^1]` | superscript `¹` |
+| `#tag` | accent-coloured tag |
 | front matter, inline HTML | dimmed |
 
 * The cursor line (and every selected line in visual mode) is shown raw.
@@ -58,11 +59,16 @@ Like Obsidian, headings get progressively smaller from `#` to `######`:
   (OSC 66), headings are drawn with a genuinely larger font: H1 2×, H2 1.75×,
   H3 1.5×, H4 1.25× (each using two rows); H5/H6 are normal size. Support is
   detected automatically at startup. (kitty supports it; Ghostty, as of 1.3,
-  does not, so it gets the decorated style below.)
-* Elsewhere they are emphasised by decoration instead: H1 as spaced capitals
-  over a heavy `━` rule, H2 over a light `─` rule, H3–H6 by colour and weight.
+  does not, so it uses the normal-size style below.)
+* Elsewhere headings stay normal size and, like Obsidian's default theme, keep
+  the text colour with no underline: H1/H2 bold and bright, H3/H4 bold, H5/H6
+  bold and progressively muted.
 
-`:set noheadingscale` forces the decorated style; `MDVIM_NO_TEXT_SIZING=1`
+The default colours follow Obsidian's default dark theme (purple accent for
+links, tags, checkboxes and quote bars; muted bullets; plain text on a shaded
+background for inline code). Every group can be restyled under `[theme]`.
+
+`:set noheadingscale` turns real sizing off; `MDVIM_NO_TEXT_SIZING=1`
 skips the startup probe entirely.
 
 ### Markdown editing helpers

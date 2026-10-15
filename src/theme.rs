@@ -23,6 +23,8 @@ impl Default for Theme {
         let u = Modifier::UNDERLINED;
         let d = Modifier::DIM;
         let code_bg = Indexed(236);
+        // Obsidian's default accent purple.
+        let accent = Rgb(167, 139, 250);
         let pairs: Vec<(&str, Style)> = vec![
             // UI
             ("normal", s()),
@@ -52,34 +54,38 @@ impl Default for Theme {
             ("pmenusel", s().bg(Blue).fg(Black)),
             ("matchparen", s().bg(Indexed(240)).add_modifier(b)),
             // Markdown
-            ("h1", s().fg(LightMagenta).add_modifier(b | u)),
-            ("h2", s().fg(LightBlue).add_modifier(b | u)),
-            ("h3", s().fg(LightCyan).add_modifier(b)),
-            ("h4", s().fg(LightGreen).add_modifier(b)),
-            ("h5", s().fg(LightYellow).add_modifier(b)),
-            ("h6", s().fg(Gray).add_modifier(b)),
+            // Obsidian's default theme: headings keep the text colour and are
+            // set apart by size and weight; without real sizing, deeper
+            // levels get progressively quieter.
+            ("h1", s().fg(White).add_modifier(b)),
+            ("h2", s().fg(White).add_modifier(b)),
+            ("h3", s().add_modifier(b)),
+            ("h4", s().add_modifier(b)),
+            ("h5", s().fg(Gray).add_modifier(b)),
+            ("h6", s().fg(DarkGray).add_modifier(b)),
             ("bold", s().add_modifier(b)),
             ("italic", s().add_modifier(i)),
             ("strike", s().add_modifier(Modifier::CROSSED_OUT).fg(Gray)),
-            ("highlight", s().bg(Indexed(58)).fg(LightYellow)),
-            ("code", s().bg(code_bg).fg(LightRed)),
+            ("highlight", s().bg(Rgb(94, 84, 32))),
+            ("code", s().bg(code_bg)),
             ("codeblock", s().bg(code_bg)),
             ("codefence", s().fg(DarkGray).bg(code_bg)),
-            ("link", s().fg(LightBlue).add_modifier(u)),
+            ("link", s().fg(accent).add_modifier(u)),
             ("url", s().fg(DarkGray).add_modifier(u)),
-            ("image", s().fg(LightMagenta)),
-            ("quote", s().fg(Gray).add_modifier(i)),
-            ("quotebar", s().fg(Blue)),
-            ("listmarker", s().fg(LightBlue).add_modifier(b)),
-            ("taskbox", s().fg(LightBlue)),
+            ("image", s().fg(accent)),
+            ("quote", s()),
+            ("quotebar", s().fg(accent)),
+            ("listmarker", s().fg(DarkGray)),
+            ("taskbox", s().fg(accent)),
             ("taskdone", s().fg(DarkGray).add_modifier(Modifier::CROSSED_OUT)),
+            ("tag", s().fg(accent).bg(Rgb(48, 41, 74))),
             ("hr", s().fg(DarkGray)),
             ("tableborder", s().fg(DarkGray)),
             ("tableheader", s().add_modifier(b)),
             ("markup", s().fg(DarkGray)),
             ("html", s().fg(DarkGray)),
             ("math", s().fg(LightGreen).add_modifier(i)),
-            ("footnote", s().fg(LightBlue)),
+            ("footnote", s().fg(accent)),
             ("frontmatter", s().fg(DarkGray)),
         ];
         Theme { groups: pairs.into_iter().map(|(k, v)| (k.to_string(), v)).collect() }

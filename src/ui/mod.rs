@@ -163,6 +163,7 @@ pub fn md_style(theme: &Theme, f: u32) -> Style {
         (TABLEHDR, "tableheader"),
         (TABLEBORDER, "tableborder"),
         (HR, "hr"),
+        (TAG, "tag"),
         (FOLD_FLAG, "fold"),
         (MARKUP, "markup"),
     ];
@@ -413,14 +414,6 @@ fn draw_window(ed: &Editor, buf: &mut TBuf, id: WinId, r: Rect, overlays: &mut V
                 };
                 let st = if is_cursor_line { theme.get("cursorlinenr") } else { theme.get("linenr") };
                 put(buf, r.x, y, &num, st, g);
-            }
-            let is_rule_row = lv.rule.is_some() && ri + 1 == lv.rows.len();
-            if let (true, Some((ch, flags))) = (is_rule_row, lv.rule) {
-                let st = base.patch(md_style(theme, flags)).remove_modifier(Modifier::UNDERLINED);
-                let width = lv.rl.cells.iter().map(|c| c.width as usize).sum::<usize>().clamp(1, tr.w as usize);
-                put(buf, tr.x, y, &ch.to_string().repeat(if ch == '━' { tr.w as usize } else { width }), st, tr.w);
-                y += 1;
-                continue;
             }
             if let Some(sc) = lv.scale
                 && y + sc.s as u16 <= tr.y + tr.h

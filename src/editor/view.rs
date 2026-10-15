@@ -17,8 +17,6 @@ pub struct LineView {
     pub raw: bool,
     /// Heading drawn with the terminal text-sizing protocol.
     pub scale: Option<Scale>,
-    /// Extra row under the line filled with this char (fallback heading rule).
-    pub rule: Option<(char, u32)>,
 }
 
 /// Kitty text-sizing parameters: block of `s`×`s` cells, font scaled by `n/d`.
@@ -55,14 +53,12 @@ impl LineView {
 
     /// Total screen rows the line occupies.
     pub fn height(&self) -> usize {
-        let text_rows = self.rows.len() - self.rule.is_some() as usize;
-        text_rows * self.row_h() + self.rule.is_some() as usize
+        self.rows.len() * self.row_h()
     }
 
     /// Wrapped-row index for a screen row offset within the line.
     pub fn row_at(&self, rel: usize) -> usize {
-        let text_rows = self.rows.len() - self.rule.is_some() as usize;
-        (rel / self.row_h()).min(text_rows.saturating_sub(1))
+        (rel / self.row_h()).min(self.rows.len().saturating_sub(1))
     }
 }
 
@@ -184,28 +180,22 @@ impl Editor {
                 let w = unicode_width::UnicodeWidthChar::width(c).unwrap_or(1) as u8;
                 rl.cells.push(Cell { ch: c, width: w, flags: FOLD_FLAG, src: None });
             }
-            let (scale, rule) = self.heading_style(buf, line, mode, &mut rl);
+            let scale = self.heading_scale(buf, line, mode, &rl);
             let mut rows = std::iter::once(0..rl.cells.len()).collect::<Vec<_>>();
             if self.options.wrap {
                 rows = wrap(&rl.cells, Self::wrap_width(width, scale), self.options.linebreak);
                 rows.truncate(1);
             }
-            if rule.is_some() {
-                rows.push(rl.cells.len()..rl.cells.len());
-            }
-            return LineView { line, rl, rows, fold_end: Some(e), raw: mode != RenderMode::Preview, scale, rule };
+            return LineView { line, rl, rows, fold_end: Some(e), raw: mode != RenderMode::Preview, scale };
         }
-        let mut rl = self.render_buf_line(buf, line, mode);
-        let (scale, rule) = self.heading_style(buf, line, mode, &mut rl);
-        let mut rows = if self.options.wrap {
+        let rl = self.render_buf_line(buf, line, mode);
+        let scale = self.heading_scale(buf, line, mode, &rl);
+        let rows = if self.options.wrap {
             wrap(&rl.cells, Self::wrap_width(width, scale), self.options.linebreak)
         } else {
             std::iter::once(0..rl.cells.len()).collect()
         };
-        if rule.is_some() {
-            rows.push(rl.cells.len()..rl.cells.len());
-        }
-        LineView { line, rl, rows, fold_end: None, raw: mode != RenderMode::Preview, scale, rule }
+        LineView { line, rl, rows, fold_end: None, raw: mode != RenderMode::Preview, scale }
     }
 
     /// Width in normal-size cells available to a (possibly scaled) row.
@@ -217,43 +207,16 @@ impl Editor {
         }
     }
 
-    /// Size previewed headings: real scaling where the terminal supports the
-    /// kitty text-sizing protocol, otherwise decoration (H1 spaced capitals
-    /// with a heavy rule, H2 with a light rule).
-    fn heading_style(&self, buf: &Buffer, line: usize, mode: RenderMode, rl: &mut RenderedLine) -> (Option<Scale>, Option<(char, u32)>) {
-        if mode != RenderMode::Preview || !buf.is_markdown() {
-            return (None, None);
+    /// Size previewed headings with the kitty text-sizing protocol where the
+    /// terminal supports it; otherwise they are styled by weight only.
+    fn heading_scale(&self, buf: &Buffer, line: usize, mode: RenderMode, rl: &RenderedLine) -> Option<Scale> {
+        if mode != RenderMode::Preview || !buf.is_markdown() || rl.cells.is_empty() {
+            return None;
         }
-        let Some(level) = buf.markdown().heading_level(line) else { return (None, None) };
-        if rl.cells.is_empty() {
-            return (None, None);
+        if !(self.text_sizing && self.options.headingscale) {
+            return None;
         }
-        if self.text_sizing && self.options.headingscale {
-            return (Scale::for_heading(level), None);
-        }
-        let hflags = crate::markdown::flags::heading(level);
-        match level {
-            1 => {
-                let mut spaced = Vec::with_capacity(rl.cells.len() * 2);
-                let n = rl.cells.len();
-                for (i, c) in rl.cells.drain(..).enumerate() {
-                    let is_text = c.flags & FOLD_FLAG == 0;
-                    let upper: Vec<char> = if is_text { c.ch.to_uppercase().collect() } else { vec![c.ch] };
-                    for (k, u) in upper.into_iter().enumerate() {
-                        let w = unicode_width::UnicodeWidthChar::width(u).unwrap_or(c.width as usize) as u8;
-                        spaced.push(Cell { ch: u, width: w, src: if k == 0 { c.src } else { None }, ..c });
-                    }
-                    // Letter-space the text; word gaps widen too.
-                    if is_text && (i + 1 < n || c.ch == ' ') {
-                        spaced.push(Cell { ch: ' ', width: 1, src: None, ..c });
-                    }
-                }
-                rl.cells = spaced;
-                (None, Some(('━', hflags)))
-            }
-            2 => (None, Some(('─', hflags))),
-            _ => (None, None),
-        }
+        Scale::for_heading(buf.markdown().heading_level(line)?)
     }
 
     /// Lines displayed in a window, from its top line, filling its height.
