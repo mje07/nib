@@ -1,0 +1,36 @@
+# Kanagawa (Wave) — rebelot/kanagawa.nvim
+name = "Kanagawa Wave"
+
+[palette]
+bg = "#1f1f28"          # sumiInk3
+bg_dark = "#16161d"     # sumiInk0
+bg_alt = "#2a2a37"      # sumiInk4
+bg_hl = "#363646"       # sumiInk5
+selection = "#2d4f67"   # waveBlue2
+statusline = "#2a2a37"
+border = "#54546d"      # sumiInk6
+fg = "#dcd7ba"          # fujiWhite
+fg_muted = "#c8c093"    # oldWhite
+fg_faint = "#727169"    # fujiGray
+accent = "#957fb8"      # oniViolet
+red = "#e46876"         # waveRed
+orange = "#ffa066"      # surimiOrange
+yellow = "#e6c384"      # carpYellow
+green = "#98bb6c"       # springGreen
+cyan = "#7aa89f"        # waveAqua2
+blue = "#7e9cd8"        # crystalBlue
+purple = "#957fb8"      # oniViolet
+h1 = "#e46876"
+h2 = "#ffa066"
+h3 = "#e6c384"
+h4 = "#98bb6c"
+h5 = "#7fb4ca"          # springBlue
+h6 = "#957fb8"
+bold = "#ffa066"
+italic = "#d27e99"      # sakuraPink
+code = "#98bb6c"
+link = "#7e9cd8"
+tag = "#d27e99"
+quote = "#c8c093"
+highlight_bg = "#49443c" # winterYellow
+cursorlinenr = "#ff9e3b" # roninYellow

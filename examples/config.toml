@@ -4,6 +4,15 @@
 # Key used for <leader> in mappings (default: space).
 leader = " "
 
+# Colour scheme (switch at runtime with :colorscheme, Tab completes):
+#   default (follows your terminal's colours), obsidian, obsidian-light,
+#   kanagawa, kanagawa-dragon, kanagawa-lotus, tokyonight, tokyonight-storm,
+#   tokyonight-moon, tokyonight-day, catppuccin-mocha, catppuccin-macchiato,
+#   catppuccin-frappe, catppuccin-latte, rose-pine, rose-pine-moon,
+#   rose-pine-dawn, gruvbox, gruvbox-light, nord, dracula, everforest
+# or the name of your own scheme in ~/.config/mdvim/themes/NAME.toml.
+colorscheme = "tokyonight"
+
 [options]
 number = true
 relativenumber = false
@@ -39,10 +48,10 @@ clipboard = false       # true: unnamed register uses the system clipboard
 [keymaps.visual]
 "<leader>y" = "\"+y"
 
-# Highlight groups: fg/bg accept names ("blue", "lightmagenta"), hex ("#ff79c6")
-# or 0-255 palette indices; plus bold/italic/underline/dim/reversed/strikethrough.
+# Per-group overrides, applied on top of whichever scheme is active.
+# fg/bg accept the scheme's palette names ("accent", "h1", "red", "fg_muted", …),
+# terminal colour names ("blue", "lightmagenta"), hex ("#ff79c6") or 0-255
+# indices; plus bold/italic/underline/dim/reversed/strikethrough.
 [theme]
-h1 = { fg = "#ff79c6", bold = true, underline = true }
-h2 = { fg = "#bd93f9", bold = true }
-code = { fg = "#f1fa8c", bg = "236" }
-link = { fg = "#8be9fd", underline = true }
+h1 = { fg = "h1", bold = true, underline = true }
+link = { fg = "cyan", underline = true }

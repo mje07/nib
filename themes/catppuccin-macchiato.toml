@@ -1,0 +1,37 @@
+# Catppuccin Macchiato — catppuccin/obsidian
+name = "Catppuccin Macchiato"
+
+[palette]
+bg = "#24273a"  # base
+bg_dark = "#181926"  # crust
+bg_alt = "#1e2030"  # mantle
+bg_hl = "#363a4f"  # surface0
+selection = "#494d64"  # surface1
+statusline = "#1e2030"  # mantle
+border = "#5b6078"  # surface2
+fg = "#cad3f5"  # text
+fg_muted = "#a5adcb"  # subtext0
+fg_faint = "#6e738d"  # overlay0
+accent = "#c6a0f6"  # mauve
+red = "#ed8796"
+orange = "#f5a97f"  # peach
+yellow = "#eed49f"
+green = "#a6da95"
+cyan = "#8bd5ca"  # teal
+blue = "#8aadf4"
+purple = "#c6a0f6"  # mauve
+h1 = "#ed8796"  # red
+h2 = "#f5a97f"  # peach
+h3 = "#eed49f"  # yellow
+h4 = "#a6da95"  # green
+h5 = "#7dc4e4"  # sapphire
+h6 = "#b7bdf8"  # lavender
+bold = "#ed8796"  # red
+italic = "#a6da95"  # green
+code = "#f5a97f"  # peach
+link = "#b7bdf8"  # lavender
+tag = "#f5bde6"  # pink
+quote = "#a5adcb"  # subtext0
+listmarker = "#c6a0f6"  # mauve
+math = "#91d7e3"  # sky
+cursorlinenr = "#b7bdf8"  # lavender

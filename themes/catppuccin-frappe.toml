@@ -1,0 +1,37 @@
+# Catppuccin Frappé — catppuccin/obsidian
+name = "Catppuccin Frappé"
+
+[palette]
+bg = "#303446"  # base
+bg_dark = "#232634"  # crust
+bg_alt = "#292c3c"  # mantle
+bg_hl = "#414559"  # surface0
+selection = "#51576d"  # surface1
+statusline = "#292c3c"  # mantle
+border = "#626880"  # surface2
+fg = "#c6d0f5"  # text
+fg_muted = "#a5adce"  # subtext0
+fg_faint = "#737994"  # overlay0
+accent = "#ca9ee6"  # mauve
+red = "#e78284"
+orange = "#ef9f76"  # peach
+yellow = "#e5c890"
+green = "#a6d189"
+cyan = "#81c8be"  # teal
+blue = "#8caaee"
+purple = "#ca9ee6"  # mauve
+h1 = "#e78284"  # red
+h2 = "#ef9f76"  # peach
+h3 = "#e5c890"  # yellow
+h4 = "#a6d189"  # green
+h5 = "#85c1dc"  # sapphire
+h6 = "#babbf1"  # lavender
+bold = "#e78284"  # red
+italic = "#a6d189"  # green
+code = "#ef9f76"  # peach
+link = "#babbf1"  # lavender
+tag = "#f4b8e4"  # pink
+quote = "#a5adce"  # subtext0
+listmarker = "#ca9ee6"  # mauve
+math = "#99d1db"  # sky
+cursorlinenr = "#babbf1"  # lavender

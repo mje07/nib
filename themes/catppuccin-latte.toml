@@ -1,0 +1,37 @@
+# Catppuccin Latte — catppuccin/obsidian
+name = "Catppuccin Latte"
+
+[palette]
+bg = "#eff1f5"  # base
+bg_dark = "#dce0e8"  # crust
+bg_alt = "#e6e9ef"  # mantle
+bg_hl = "#ccd0da"  # surface0
+selection = "#bcc0cc"  # surface1
+statusline = "#e6e9ef"  # mantle
+border = "#acb0be"  # surface2
+fg = "#4c4f69"  # text
+fg_muted = "#6c6f85"  # subtext0
+fg_faint = "#9ca0b0"  # overlay0
+accent = "#8839ef"  # mauve
+red = "#d20f39"
+orange = "#fe640b"  # peach
+yellow = "#df8e1d"
+green = "#40a02b"
+cyan = "#179299"  # teal
+blue = "#1e66f5"
+purple = "#8839ef"  # mauve
+h1 = "#d20f39"  # red
+h2 = "#fe640b"  # peach
+h3 = "#df8e1d"  # yellow
+h4 = "#40a02b"  # green
+h5 = "#209fb5"  # sapphire
+h6 = "#7287fd"  # lavender
+bold = "#d20f39"  # red
+italic = "#40a02b"  # green
+code = "#fe640b"  # peach
+link = "#7287fd"  # lavender
+tag = "#ea76cb"  # pink
+quote = "#6c6f85"  # subtext0
+listmarker = "#8839ef"  # mauve
+math = "#04a5e5"  # sky
+cursorlinenr = "#7287fd"  # lavender

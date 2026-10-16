@@ -1,0 +1,10 @@
+name = "Tokyo Night Storm"
+base = "tokyonight"
+
+[palette]
+bg = "#24283b"
+bg_dark = "#1f2335"
+bg_alt = "#1f2335"
+bg_hl = "#292e42"
+selection = "#2e3c64"
+statusline = "#1d202f"

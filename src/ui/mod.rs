@@ -421,7 +421,7 @@ fn draw_window(ed: &Editor, buf: &mut TBuf, id: WinId, r: Rect, overlays: &mut V
                 let cells = &lv.rl.cells[row.clone()];
                 let chars: Vec<(char, u8)> = cells.iter().filter(|c| c.width > 0).map(|c| (c.ch, c.width)).collect();
                 let flags = cells.iter().find(|c| c.flags & FOLD_FLAG == 0).map(|c| c.flags).unwrap_or(0);
-                let style = base.patch(*cache.entry(flags).or_insert_with(|| md_style(theme, flags)));
+                let style = theme.get("normal").patch(base).patch(*cache.entry(flags).or_insert_with(|| md_style(theme, flags)));
                 let base_w: usize = chars.iter().map(|(_, w)| *w as usize).sum();
                 let width = ((base_w as f32 * sc.factor()).ceil() as u16 + sc.s as u16).min(tr.w);
                 overlays.push(TextOverlay { x: tr.x, y, scale: sc, chars, style, width });

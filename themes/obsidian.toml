@@ -1,0 +1,28 @@
+# Obsidian's default dark theme, with explicit colours (the `default`
+# scheme approximates it with the terminal's own palette instead).
+name = "Obsidian"
+
+[palette]
+bg = "#1e1e1e"
+bg_dark = "#161616"
+bg_alt = "#262626"
+bg_hl = "#2a2a2a"
+selection = "#403955"
+statusline = "#262626"
+border = "#3f3f3f"
+fg = "#dadada"
+fg_muted = "#b3b3b3"
+fg_faint = "#666666"
+accent = "#a88bfa"
+red = "#fb464c"
+orange = "#e9973f"
+yellow = "#e0de71"
+green = "#44cf6e"
+cyan = "#53dfdd"
+blue = "#027aff"
+purple = "#a882ff"
+# Headings keep the text colour; deeper levels get quieter.
+h5 = "#b3b3b3"
+h6 = "#666666"
+highlight_bg = "#5e5420"
+tag_bg = "#30294a"

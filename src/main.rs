@@ -61,6 +61,9 @@ struct Cli {
     /// Emit ANSI colours with --dump-render
     #[arg(long)]
     ansi: bool,
+    /// Colour scheme to use (overrides the config file; see :colorscheme)
+    #[arg(long, value_name = "NAME")]
+    colorscheme: Option<String>,
 }
 
 fn main() {
@@ -78,7 +81,7 @@ fn main() {
         .collect();
     let cli = Cli::parse_from(args);
     if let Some(path) = &cli.dump_render {
-        if let Err(e) = dump_render(path, cli.width, cli.cursor, cli.ansi) {
+        if let Err(e) = dump_render(path, cli.width, cli.cursor, cli.ansi, cli.colorscheme.as_deref()) {
             eprintln!("mdvim: {e}");
             std::process::exit(1);
         }
@@ -101,6 +104,11 @@ fn setup_editor(cli: &Cli, w: u16, h: u16, goto: Option<Option<usize>>) -> Edito
                 errs = config::load(&mut ed, &p);
             }
         }
+    }
+    if let Some(name) = &cli.colorscheme
+        && let Err(e) = ed.set_colorscheme(name)
+    {
+        errs.push(e);
     }
     ed.registers.use_clipboard = ed.options.clipboard;
     if !cli.files.is_empty() {
@@ -348,8 +356,11 @@ fn base64(data: &[u8]) -> String {
 }
 
 /// Render a file as the editor would display it and print it to stdout.
-fn dump_render(path: &PathBuf, width: u16, cursor: Option<usize>, ansi: bool) -> anyhow::Result<()> {
+fn dump_render(path: &PathBuf, width: u16, cursor: Option<usize>, ansi: bool, colorscheme: Option<&str>) -> anyhow::Result<()> {
     let mut ed = Editor::new(width, 10);
+    if let Some(name) = colorscheme {
+        ed.set_colorscheme(name).map_err(|e| anyhow::anyhow!(e))?;
+    }
     ed.open_initial(std::slice::from_ref(path));
     ed.messages.clear();
     // Tall enough to show the whole document.

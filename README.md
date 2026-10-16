@@ -66,10 +66,85 @@ Like Obsidian, headings get progressively smaller from `#` to `######`:
 
 The default colours follow Obsidian's default dark theme (purple accent for
 links, tags, checkboxes and quote bars; muted bullets; plain text on a shaded
-background for inline code). Every group can be restyled under `[theme]`.
+background for inline code). See [Themes](#themes) for Kanagawa, Tokyo Night,
+Catppuccin and more.
 
 `:set noheadingscale` turns real sizing off; `MDVIM_NO_TEXT_SIZING=1`
 skips the startup probe entirely.
+
+## Themes
+
+Colour schemes work like Obsidian themes: each one is a small palette of
+semantic colours — background, secondary background (code, menus), text,
+muted and faint text, an accent, heading colours, and so on — that cascades
+into every highlight group, and the scheme paints its own background.
+Translucent touches such as tag pills and `==highlights==` are blended from the
+palette the way Obsidian blends `rgba(accent, 0.15)`.
+
+```
+:colorscheme kanagawa      " switch (Tab completes; :colo for short)
+:colorscheme               " show the current scheme
+mdvim --colorscheme nord file.md
+```
+
+or set `colorscheme = "catppuccin-mocha"` at the top of `config.toml`.
+
+| Family | Schemes |
+|---|---|
+| Terminal | `default` (uses your terminal's ANSI colours) |
+| Obsidian | `obsidian`, `obsidian-light` |
+| Kanagawa | `kanagawa` (wave), `kanagawa-dragon`, `kanagawa-lotus` |
+| Tokyo Night | `tokyonight`, `tokyonight-storm`, `tokyonight-moon`, `tokyonight-day` |
+| Catppuccin | `catppuccin-mocha` (alias `catppuccin`), `catppuccin-macchiato`, `catppuccin-frappe`, `catppuccin-latte` |
+| Rosé Pine | `rose-pine`, `rose-pine-moon`, `rose-pine-dawn` |
+| Others | `gruvbox`, `gruvbox-light`, `nord`, `dracula`, `everforest` |
+
+Schemes other than `default` use 24-bit colour, so your terminal needs
+truecolor support (almost all modern terminals have it).
+
+### Writing your own
+
+Drop a TOML file in `~/.config/mdvim/themes/NAME.toml` and load it with
+`:colorscheme NAME` (a path to any `.toml` file works too). A file with the
+same name as a built-in replaces it. The built-in schemes in
+[`themes/`](themes/) are written in the same format, so they make good
+starting points.
+
+```toml
+name = "My Theme"
+base = "tokyonight"        # optional: inherit everything, override below
+
+[palette]
+bg = "#1b1d2b"             # bg, fg and accent are required without a base
+fg = "#c8d3f5"
+accent = "#ff966c"
+h1 = "#ff757f"
+
+[groups]                   # optional per-group tweaks; colours may name palette keys
+h1 = { fg = "h1", bold = true, underline = true }
+quote = { fg = "fg_muted", italic = true }
+```
+
+Palette keys (anything left out falls back to a sensible neighbour):
+
+| Key | Used for | Falls back to |
+|---|---|---|
+| `bg`, `fg`, `accent` | background, text, links/tags/checkboxes/quote bars/mode badge | — |
+| `bg_dark` | inactive statusline, tabline | `bg` |
+| `bg_alt` | inline code, code blocks, completion menu | `bg_dark` |
+| `bg_hl`, `selection`, `statusline` | cursorline, visual selection, statusline | `bg_alt` / `bg_hl` / `bg_alt` |
+| `fg_muted`, `fg_faint` | struck text, quotes; line numbers, markup, front matter | `fg` / `fg_muted` |
+| `border` | splits, table borders, rules | `fg_faint` |
+| `red` `orange` `yellow` `green` `cyan` `blue` `purple` | modes, search, messages | terminal colours |
+| `h1` … `h6` | headings | `fg` |
+| `bold`, `italic`, `code`, `quote` | inline styles | `fg` |
+| `link`, `tag`, `tag_bg` | links, `#tags` and their pill | `accent` / `accent` / tag blended into bg |
+| `listmarker`, `highlight_bg`, `math`, `cursorlinenr` | bullets, `==text==`, math, current line number | `fg_faint` / yellow blended into bg / `cyan` / `accent` |
+
+Groups set under `[theme]` in `config.toml` are applied on top of whichever
+scheme is active, and survive `:colorscheme` switches; there, too, colours may
+name palette keys (`link = { fg = "cyan", underline = true }` uses the scheme's
+own cyan).
 
 ### Markdown editing helpers
 
@@ -146,6 +221,7 @@ commands, file paths, options and buffers, and `Ctrl-r {reg}` / `Ctrl-r Ctrl-w`.
 `~/.config/mdvim/config.toml` — see [`examples/config.toml`](examples/config.toml)
 for every setting. It covers options, non-recursive key mappings per mode
 (`[keymaps.normal]`, `insert`, `visual`, `operator`), the leader key, and colours
+the colour scheme (`colorscheme = "…"`, see [Themes](#themes)), and overrides
 for every highlight group (UI groups like `statusline`, `visual`, `search`, and
 markdown groups `h1`…`h6`, `bold`, `code`, `codeblock`, `link`, `quote`,
 `listmarker`, `taskbox`, `taskdone`, `tableborder`, `markup`, …).

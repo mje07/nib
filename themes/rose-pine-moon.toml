@@ -1,0 +1,18 @@
+name = "Rosé Pine Moon"
+base = "rose-pine"
+
+[palette]
+bg = "#232136"
+bg_dark = "#1c1a2c"
+bg_alt = "#2a273f"
+bg_hl = "#393552"
+selection = "#44415a"
+statusline = "#2a273f"
+border = "#56526e"
+orange = "#ea9a97"
+green = "#3e8fb0"
+blue = "#3e8fb0"
+h3 = "#ea9a97"
+h5 = "#3e8fb0"
+bold = "#ea9a97"
+tag = "#ea9a97"

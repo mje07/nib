@@ -31,6 +31,7 @@ const CMDS: &[(&str, usize)] = &[
     ("bwipeout", 2),
     ("cd", 2),
     ("close", 3),
+    ("colorscheme", 4),
     ("copy", 2),
     ("delete", 1),
     ("display", 2),
@@ -141,6 +142,7 @@ mdvim — vim-style editor with live markdown preview
   Folds (markdown headings): za zc zo zR zM   Links: gx (open URL) gf (open file)
   Markdown: <leader>x toggles a task; Enter continues lists; Tab/S-Tab indent items
   :preview toggles live preview for the window; :set nopreview disables it globally
+  :colorscheme {name} switches theme (Tab lists them); :colorscheme shows the current one
   Ex: :w :q :x :e :s :g :v :norm :sort :m :t :d :y :pu :j :> :< :! :r :set :map :ls :b :reg :marks";
 
 impl Editor {
@@ -873,6 +875,18 @@ impl Editor {
                 std::env::set_current_dir(&dir).map_err(|e| format!("E344: Can't find directory \"{}\": {e}", dir.display()))?;
                 self.info(dir.display().to_string());
                 Ok(())
+            }
+            "colorscheme" => {
+                if args.is_empty() {
+                    let t = &self.theme;
+                    self.info(match &t.title {
+                        Some(title) => format!("{} — {title}", t.name),
+                        None => t.name.clone(),
+                    });
+                    Ok(())
+                } else {
+                    self.set_colorscheme(&args)
+                }
             }
             "help" => {
                 self.show_lines(HELP.lines().map(String::from).collect());

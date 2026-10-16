@@ -1,0 +1,36 @@
+# Rosé Pine — rose-pine/neovim
+name = "Rosé Pine"
+
+[palette]
+bg = "#191724"          # base
+bg_dark = "#13111c"
+bg_alt = "#1f1d2e"      # surface
+bg_hl = "#26233a"       # overlay
+selection = "#403d52"   # highlight med
+statusline = "#1f1d2e"
+border = "#524f67"      # highlight high
+fg = "#e0def4"          # text
+fg_muted = "#908caa"    # subtle
+fg_faint = "#6e6a86"    # muted
+accent = "#c4a7e7"      # iris
+red = "#eb6f92"         # love
+orange = "#ebbcba"      # rose
+yellow = "#f6c177"      # gold
+green = "#31748f"       # pine
+cyan = "#9ccfd8"        # foam
+blue = "#31748f"
+purple = "#c4a7e7"
+h1 = "#c4a7e7"
+h2 = "#9ccfd8"
+h3 = "#ebbcba"
+h4 = "#f6c177"
+h5 = "#31748f"
+h6 = "#9ccfd8"
+bold = "#ebbcba"
+italic = "#c4a7e7"
+code = "#9ccfd8"
+link = "#9ccfd8"
+tag = "#ebbcba"
+quote = "#908caa"
+listmarker = "#908caa"
+cursorlinenr = "#f6c177"

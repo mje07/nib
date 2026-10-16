@@ -1,0 +1,35 @@
+# Nord — nordtheme
+name = "Nord"
+
+[palette]
+bg = "#2e3440"          # nord0
+bg_dark = "#242933"
+bg_alt = "#3b4252"      # nord1
+bg_hl = "#3b4252"
+selection = "#434c5e"   # nord2
+statusline = "#3b4252"
+border = "#4c566a"      # nord3
+fg = "#d8dee9"          # nord4
+fg_muted = "#a5adba"
+fg_faint = "#616e88"
+accent = "#88c0d0"      # nord8
+red = "#bf616a"
+orange = "#d08770"
+yellow = "#ebcb8b"
+green = "#a3be8c"
+cyan = "#8fbcbb"
+blue = "#81a1c1"
+purple = "#b48ead"
+h1 = "#bf616a"
+h2 = "#d08770"
+h3 = "#ebcb8b"
+h4 = "#a3be8c"
+h5 = "#88c0d0"
+h6 = "#b48ead"
+bold = "#81a1c1"
+italic = "#b48ead"
+code = "#8fbcbb"
+link = "#88c0d0"
+tag = "#81a1c1"
+quote = "#a5adba"
+cursorlinenr = "#ebcb8b"

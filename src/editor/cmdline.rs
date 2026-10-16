@@ -32,7 +32,7 @@ pub const EX_COMMANDS: &[&str] = &[
     "close", "only", "tabnew", "tabedit", "tabnext", "tabprevious", "tabclose", "tabonly", "tabfirst", "tablast",
     "buffers", "ls", "files", "buffer", "bnext", "bprevious", "bdelete", "bwipeout", "bfirst", "blast", "registers",
     "display", "marks", "jumps", "nohlsearch", "preview", "task", "pwd", "cd", "help", "mark", "resize", "vertical",
-    "retab", "messages",
+    "retab", "messages", "colorscheme",
 ];
 
 impl Editor {
@@ -337,6 +337,12 @@ impl Editor {
                     .map(|(l, _)| *l)
                     .filter(|l| l.starts_with(a))
                     .map(|l| format!("{neg}{l}"))
+                    .collect()
+            }
+            "colo" | "color" | "colors" | "colorsc" | "colorsch" | "colorsche" | "colorschem" | "colorscheme" => {
+                crate::theme::available(crate::theme::user_dir().as_deref())
+                    .into_iter()
+                    .filter(|n| n.starts_with(arg.as_str()))
                     .collect()
             }
             "b" | "bu" | "buf" | "buffer" | "bd" | "bdelete" => self

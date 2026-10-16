@@ -159,6 +159,8 @@ pub struct Editor {
     pub mode: Mode,
     pub options: Options,
     pub theme: Theme,
+    /// Group overrides from config `[theme]`, re-applied on `:colorscheme`.
+    pub theme_overrides: Vec<(String, crate::theme::StyleSpec)>,
     pub leader: String,
     pub keymaps: Keymaps,
     pub registers: Registers,
@@ -207,6 +209,7 @@ impl Editor {
             mode: Mode::Normal,
             options: Options::default(),
             theme: Theme::default(),
+            theme_overrides: Vec::new(),
             leader: " ".into(),
             keymaps: Keymaps::default(),
             registers: Registers::default(),
@@ -346,6 +349,24 @@ impl Editor {
     }
 
     // --- Messages -----------------------------------------------------------
+
+    /// Switch colour scheme, keeping the user's group overrides on top.
+    pub fn set_colorscheme(&mut self, name: &str) -> Result<(), String> {
+        self.theme = crate::theme::load(name, crate::theme::user_dir().as_deref())?;
+        let errs = self.apply_theme_overrides();
+        match errs.first() {
+            Some(e) => Err(format!("theme.{e}")),
+            None => Ok(()),
+        }
+    }
+
+    /// Apply `theme_overrides` to the current scheme; returns errors.
+    pub fn apply_theme_overrides(&mut self) -> Vec<String> {
+        let overrides = std::mem::take(&mut self.theme_overrides);
+        let errs = self.theme.apply_specs(overrides.iter().map(|(g, s)| (g, s)));
+        self.theme_overrides = overrides;
+        errs
+    }
 
     pub fn info(&mut self, s: impl Into<String>) {
         self.messages = vec![(s.into(), MsgKind::Info)];

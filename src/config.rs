@@ -13,6 +13,8 @@ use crate::theme::StyleSpec;
 #[serde(deny_unknown_fields)]
 pub struct ConfigFile {
     pub leader: Option<String>,
+    /// Colour scheme: a built-in name or a file in ~/.config/mdvim/themes.
+    pub colorscheme: Option<String>,
     #[serde(default)]
     pub options: HashMap<String, toml::Value>,
     #[serde(default)]
@@ -77,12 +79,13 @@ pub fn apply(editor: &mut Editor, cfg: ConfigFile) -> Vec<String> {
             editor.keymaps.add(mode, &lhs, &rhs, true, &editor.leader.clone());
         }
     }
-    for (group, spec) in cfg.theme {
-        match spec.to_style() {
-            Ok(st) => editor.theme.set(&group, st),
-            Err(e) => errs.push(format!("config: theme.{group}: {e}")),
-        }
+    if let Some(name) = cfg.colorscheme
+        && let Err(e) = editor.set_colorscheme(&name)
+    {
+        errs.push(format!("config: colorscheme: {e}"));
     }
+    editor.theme_overrides.extend(cfg.theme);
+    errs.extend(editor.apply_theme_overrides().into_iter().map(|e| format!("config: theme.{e}")));
     errs
 }
 
@@ -97,11 +100,28 @@ mod tests {
         let errs = apply(&mut ed, cfg);
         assert!(errs.is_empty(), "{errs:?}");
         assert!(ed.options.number);
+        assert_eq!(ed.theme.name, "tokyonight");
         // The insert-mode "jk" mapping works.
         for k in crate::key::parse_keys("ihijk", " ") {
             ed.handle_key(k);
         }
         assert_eq!(ed.mode, crate::editor::Mode::Normal);
         assert_eq!(ed.buf().contents(), "hi");
+    }
+
+    #[test]
+    fn colorscheme_keeps_overrides() {
+        use ratatui::style::Color;
+        let cfg: ConfigFile =
+            toml::from_str("colorscheme = \"kanagawa\"\n[theme]\nlink = { fg = \"red\" }\n").unwrap();
+        let mut ed = Editor::new(80, 24);
+        assert!(apply(&mut ed, cfg).is_empty());
+        assert_eq!(ed.theme.name, "kanagawa");
+        // Palette names resolve against the active scheme.
+        assert_eq!(ed.theme.get("link").fg, Some(Color::Rgb(0xe4, 0x68, 0x76)));
+        ed.run_ex("colorscheme nord").unwrap();
+        assert_eq!(ed.theme.get("link").fg, Some(Color::Rgb(0xbf, 0x61, 0x6a)));
+        assert!(ed.run_ex("colorscheme nope").is_err());
+        assert_eq!(ed.theme.name, "nord");
     }
 }
