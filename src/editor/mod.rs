@@ -161,6 +161,10 @@ pub struct Editor {
     pub theme: Theme,
     /// Group overrides from config `[theme]`, re-applied on `:colorscheme`.
     pub theme_overrides: Vec<(String, crate::theme::StyleSpec)>,
+    /// Where `:colorscheme` remembers its choice (unset in tests and `-u NONE`).
+    pub colorscheme_file: Option<std::path::PathBuf>,
+    /// The config file sets `colorscheme`.
+    pub config_colorscheme: bool,
     pub leader: String,
     pub keymaps: Keymaps,
     pub registers: Registers,
@@ -211,6 +215,8 @@ impl Editor {
             options: Options::default(),
             theme: Theme::default(),
             theme_overrides: Vec::new(),
+            colorscheme_file: None,
+            config_colorscheme: false,
             leader: " ".into(),
             keymaps: Keymaps::default(),
             registers: Registers::default(),

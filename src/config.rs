@@ -79,10 +79,11 @@ pub fn apply(editor: &mut Editor, cfg: ConfigFile) -> Vec<String> {
             editor.keymaps.add(mode, &lhs, &rhs, true, &editor.leader.clone());
         }
     }
-    if let Some(name) = cfg.colorscheme
-        && let Err(e) = editor.set_colorscheme(&name)
-    {
-        errs.push(format!("config: colorscheme: {e}"));
+    if let Some(name) = cfg.colorscheme {
+        editor.config_colorscheme = true;
+        if let Err(e) = editor.set_colorscheme(&name) {
+            errs.push(format!("config: colorscheme: {e}"));
+        }
     }
     editor.theme_overrides.extend(cfg.theme);
     errs.extend(editor.apply_theme_overrides().into_iter().map(|e| format!("config: theme.{e}")));
@@ -123,5 +124,18 @@ mod tests {
         assert_eq!(ed.theme.get("link").fg, Some(Color::Rgb(0xbf, 0x61, 0x6a)));
         assert!(ed.run_ex("colorscheme nope").is_err());
         assert_eq!(ed.theme.name, "nord");
+    }
+
+    #[test]
+    fn colorscheme_is_remembered() {
+        let path = std::env::temp_dir().join(format!("mdvim-colo-test-{}", std::process::id())).join("colorscheme");
+        let mut ed = Editor::new(80, 24);
+        ed.colorscheme_file = Some(path.clone());
+        ed.run_ex("colorscheme rose-pine").unwrap();
+        assert_eq!(crate::theme::read_saved(&path).unwrap().0, "rose-pine");
+        // A failed switch leaves the remembered choice alone.
+        assert!(ed.run_ex("colorscheme nope").is_err());
+        assert_eq!(crate::theme::read_saved(&path).unwrap().0, "rose-pine");
+        std::fs::remove_dir_all(path.parent().unwrap()).unwrap();
     }
 }

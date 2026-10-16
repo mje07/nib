@@ -368,6 +368,25 @@ pub fn user_dir() -> Option<PathBuf> {
     dirs::config_dir().map(|d| d.join("mdvim").join("themes"))
 }
 
+/// Where `:colorscheme` remembers the last choice: `~/.local/state/mdvim/colorscheme`.
+pub fn saved_path() -> Option<PathBuf> {
+    dirs::state_dir().or_else(dirs::data_dir).map(|d| d.join("mdvim").join("colorscheme"))
+}
+
+/// The remembered scheme and when it was chosen.
+pub fn read_saved(path: &Path) -> Option<(String, std::time::SystemTime)> {
+    let name = std::fs::read_to_string(path).ok()?.trim().to_string();
+    let when = std::fs::metadata(path).and_then(|m| m.modified()).ok()?;
+    (!name.is_empty()).then_some((name, when))
+}
+
+pub fn save(path: &Path, name: &str) -> std::io::Result<()> {
+    if let Some(dir) = path.parent() {
+        std::fs::create_dir_all(dir)?;
+    }
+    std::fs::write(path, format!("{name}\n"))
+}
+
 /// Every scheme name `:colorscheme` accepts (built-in and user), sorted.
 pub fn available(user_dir: Option<&Path>) -> Vec<String> {
     let mut names: Vec<String> = std::iter::once("default").chain(BUILTIN.iter().map(|(n, _)| *n)).map(String::from).collect();

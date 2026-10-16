@@ -90,6 +90,9 @@ built-in JetBrains Mono when none is set. Turn sizing off with
 :colorscheme catppuccin-mocha   " Tab completes, :colo for short
 ```
 
+Your choice is remembered for next time. Setting `colorscheme` in
+`config.toml` also works; whichever you changed last wins.
+
 | Family | Schemes |
 |---|---|
 | Terminal | `default`, which uses your terminal's colours |

@@ -142,7 +142,7 @@ mdvim — vim-style editor with live markdown preview
   Folds (markdown headings): za zc zo zR zM   Links: gx (open URL) gf (open file)
   Markdown: <leader>x toggles a task; Enter continues lists; Tab/S-Tab indent items
   :preview toggles live preview for the window; :set nopreview disables it globally
-  :colorscheme {name} switches theme (Tab lists them); :colorscheme shows the current one
+  :colorscheme {name} switches theme and remembers it (Tab lists them); :colorscheme shows the current one
   Ex: :w :q :x :e :s :g :v :norm :sort :m :t :d :y :pu :j :> :< :! :r :set :map :ls :b :reg :marks";
 
 impl Editor {
@@ -885,7 +885,14 @@ impl Editor {
                     });
                     Ok(())
                 } else {
-                    self.set_colorscheme(&args)
+                    self.set_colorscheme(&args)?;
+                    // Remembered for next time, like picking a theme in Obsidian.
+                    if let Some(path) = self.colorscheme_file.clone()
+                        && let Err(e) = crate::theme::save(&path, &self.theme.name)
+                    {
+                        self.error(format!("can't remember color scheme: {}: {e}", path.display()));
+                    }
+                    Ok(())
                 }
             }
             "help" => {

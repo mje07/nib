@@ -97,19 +97,28 @@ fn main() {
 fn setup_editor(cli: &Cli, w: u16, h: u16, goto: Option<Option<usize>>) -> Editor {
     let mut ed = Editor::new(w, h);
     let mut errs = Vec::new();
-    match cli.config.as_deref() {
-        Some("NONE") => {}
-        Some(p) => errs = config::load(&mut ed, std::path::Path::new(p)),
-        None => {
-            if let Some(p) = config::default_path() {
-                errs = config::load(&mut ed, &p);
-            }
-        }
+    let config_path = match cli.config.as_deref() {
+        Some("NONE") => None,
+        Some(p) => Some(PathBuf::from(p)),
+        None => config::default_path(),
+    };
+    if let Some(p) = &config_path {
+        errs = config::load(&mut ed, p);
+        ed.colorscheme_file = theme::saved_path();
     }
-    if let Some(name) = &cli.colorscheme
-        && let Err(e) = ed.set_colorscheme(name)
-    {
-        errs.push(e);
+    if let Some(name) = &cli.colorscheme {
+        if let Err(e) = ed.set_colorscheme(name) {
+            errs.push(e);
+        }
+    } else if let Some((name, chosen)) = ed.colorscheme_file.as_deref().and_then(theme::read_saved) {
+        // The last :colorscheme wins, unless the config's colorscheme was
+        // edited since.
+        let config_changed = config_path.as_deref().and_then(|p| std::fs::metadata(p).and_then(|m| m.modified()).ok());
+        if (!ed.config_colorscheme || config_changed.is_none_or(|c| chosen >= c))
+            && let Err(e) = ed.set_colorscheme(&name)
+        {
+            errs.push(e);
+        }
     }
     ed.registers.use_clipboard = ed.options.clipboard;
     if !cli.files.is_empty() {
