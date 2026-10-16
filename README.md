@@ -1,4 +1,4 @@
-# nib
+<p align="center"><img src="docs/logo.svg" alt="nib" width="260"></p>
 
 A vim-style terminal editor with Obsidian-like live markdown preview.
 
