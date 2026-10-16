@@ -1,6 +1,7 @@
 mod buffer;
 mod config;
 mod editor;
+mod headings;
 mod key;
 mod markdown;
 mod options;
@@ -192,6 +193,11 @@ fn run(cli: Cli, goto: Option<Option<usize>>) -> anyhow::Result<()> {
     // The alternate screen starts blank, so no initial clear is needed
     // (ratatui's clear() queries the cursor position, which can stall).
     ed.text_sizing = detect_text_sizing();
+    // No text sizing: draw scaled headings as images where graphics work.
+    let mut images = if ed.text_sizing { None } else { headings::HeadingImages::detect() };
+    if images.is_some() {
+        ed.text_sizing = true;
+    }
     ed.scroll_to_cursor();
     let mut term = Terminal::new(CrosstermBackend::new(io::stdout()))?;
     let mut last_overlays: Vec<ui::TextOverlay> = Vec::new();
@@ -202,7 +208,18 @@ fn run(cli: Cli, goto: Option<Option<usize>>) -> anyhow::Result<()> {
         // Synchronized output: the terminal shows the frame only once complete.
         write!(io::stdout(), "\x1b[?2026h")?;
         let (cursor_shape, overlays, cursor_pos) = draw_frame(&mut term, &ed)?;
-        if overlays != last_overlays {
+        if let Some(img) = &mut images {
+            // Images sit above the cells, so ratatui's output is unaffected:
+            // just swap the placements.
+            if overlays != last_overlays {
+                let mut out = io::stdout();
+                out.write_all(img.draw(&overlays).as_bytes())?;
+                if let Some((x, y)) = cursor_pos {
+                    execute!(out, ratatui::crossterm::cursor::MoveTo(x, y))?;
+                }
+                last_overlays = overlays;
+            }
+        } else if overlays != last_overlays {
             // Scaled text spans several cells that ratatui does not know about;
             // clear the screen and repaint everything before drawing the new set.
             if !last_overlays.is_empty() {
@@ -249,6 +266,9 @@ fn run(cli: Cli, goto: Option<Option<usize>>) -> anyhow::Result<()> {
         }
         if ed.suspend {
             ed.suspend = false;
+            if images.is_some() {
+                write!(io::stdout(), "{}", headings::HeadingImages::clear())?;
+            }
             restore_terminal();
             unsafe {
                 libc::raise(libc::SIGTSTP);
@@ -289,7 +309,14 @@ fn run(cli: Cli, goto: Option<Option<usize>>) -> anyhow::Result<()> {
                     _ => {}
                 },
                 Event::Paste(s) => ed.paste(&s),
-                Event::Resize(w, h) => ed.resize(w, h),
+                Event::Resize(w, h) => {
+                    ed.resize(w, h);
+                    if let Some(img) = &mut images {
+                        img.invalidate();
+                        // Redraw the headings even if their positions are unchanged.
+                        last_overlays.clear();
+                    }
+                }
                 _ => {}
             }
             if ed.quit || !event::poll(Duration::from_millis(0))? {
@@ -298,6 +325,9 @@ fn run(cli: Cli, goto: Option<Option<usize>>) -> anyhow::Result<()> {
         }
     }
     drop(term);
+    if images.is_some() {
+        write!(io::stdout(), "{}", headings::HeadingImages::clear())?;
+    }
     restore_terminal();
     Ok(())
 }

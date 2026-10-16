@@ -57,20 +57,23 @@ Like Obsidian, headings get progressively smaller from `#` to `######`:
 
 * In terminals that support the [kitty text-sizing protocol](https://sw.kovidgoyal.net/kitty/text-sizing-protocol/)
   (OSC 66), headings are drawn with a genuinely larger font: H1 2×, H2 1.75×,
-  H3 1.5×, H4 1.25× (each using two rows); H5/H6 are normal size. Support is
-  detected automatically at startup. (kitty supports it; Ghostty, as of 1.3,
-  does not, so it uses the normal-size style below.)
+  H3 1.5×, H4 1.25× (each using two rows); H5/H6 are normal size. kitty
+  supports it.
+* In terminals with the [kitty graphics protocol](https://sw.kovidgoyal.net/kitty/graphics-protocol/)
+  but not text sizing — such as **Ghostty** and WezTerm — mdvim renders those
+  headings itself, at the same sizes, and shows them as images. The font
+  matches the terminal's: under Ghostty it uses your `font-family-bold` /
+  `font-family` (and `font-style-bold`) settings, resolved with fontconfig, or
+  Ghostty's built-in JetBrains Mono when none is set; elsewhere the system
+  monospace font. Characters the font lacks (emoji, CJK) come from fontconfig
+  fallbacks. Changing Ghostty's font size re-renders them.
 * Elsewhere headings stay normal size and, like Obsidian's default theme, keep
   the text colour with no underline: H1/H2 bold and bright, H3/H4 bold, H5/H6
   bold and progressively muted.
 
-The default colours follow Obsidian's default dark theme (purple accent for
-links, tags, checkboxes and quote bars; muted bullets; plain text on a shaded
-background for inline code). See [Themes](#themes) for Kanagawa, Tokyo Night,
-Catppuccin and more.
-
-`:set noheadingscale` turns real sizing off; `MDVIM_NO_TEXT_SIZING=1`
-skips the startup probe entirely.
+Support is detected automatically at startup. `:set noheadingscale` turns real
+sizing off; `MDVIM_NO_TEXT_SIZING=1` skips the text-sizing probe and
+`MDVIM_NO_HEADING_IMAGES=1` the image fallback.
 
 ## Themes
 

@@ -193,7 +193,8 @@ pub struct Editor {
     pub mouse_drag: Option<(WinId, Pos)>,
     /// Nesting depth of ex commands; undo commits are deferred while > 0.
     pub batch: usize,
-    /// The terminal supports the kitty text-sizing protocol (OSC 66).
+    /// The terminal can show scaled headings: via the kitty text-sizing
+    /// protocol (OSC 66), or as images (kitty graphics protocol).
     pub text_sizing: bool,
 }
 
