@@ -445,7 +445,7 @@ fn map_timeout_resolves() {
 
 #[test]
 fn writes_files() {
-    let dir = std::env::temp_dir().join(format!("mdvim-test-{}", std::process::id()));
+    let dir = std::env::temp_dir().join(format!("nib-test-{}", std::process::id()));
     std::fs::create_dir_all(&dir).unwrap();
     let path = dir.join("t.md");
     std::fs::write(&path, "line1\r\nline2\r\n").unwrap();
@@ -498,7 +498,7 @@ fn unnamed_buffers_are_markdown() {
     let mut e = Editor::new(80, 24);
     feed(&mut e, ":enew<CR>");
     assert!(e.buf().is_markdown());
-    let dir = std::env::temp_dir().join(format!("mdvim-ft-{}", std::process::id()));
+    let dir = std::env::temp_dir().join(format!("nib-ft-{}", std::process::id()));
     std::fs::create_dir_all(&dir).unwrap();
     let txt = dir.join("notes.txt");
     feed(&mut e, &format!(":w {}<CR>", txt.display()));

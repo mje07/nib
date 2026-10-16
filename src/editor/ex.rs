@@ -133,7 +133,7 @@ impl Parsed {
 }
 
 pub const HELP: &str = "\
-mdvim — vim-style editor with live markdown preview
+nib — vim-style editor with live markdown preview
   Modes: i a I A o O (insert)  v V Ctrl-v (visual)  R (replace)  : / ? (cmdline)
   Motions: h j k l w b e ge W B E 0 ^ $ g_ gg G f t F T ; , % { } ( ) ]] [[ H M L n N * #
   Operators: d c y > < gu gU g~ gq gw g? with motions or text objects (iw aw ip a( i\" it ...)

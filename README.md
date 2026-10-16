@@ -1,8 +1,8 @@
-# mdvim
+# nib
 
 A vim-style terminal editor with Obsidian-like live markdown preview.
 
-![mdvim in four colour schemes](docs/screenshot.png)
+![nib in four colour schemes](docs/screenshot.png)
 
 Markdown renders in place as you edit: markers disappear, headings take on
 colour and size, tasks become checkboxes and tables get borders. The line
@@ -26,18 +26,18 @@ plain modal vim.
 Requires a recent Rust toolchain.
 
 ```sh
-git clone https://github.com/mje07/mdvim
-cd mdvim
+git clone https://github.com/mje07/nib
+cd nib
 cargo install --path .
 ```
 
 ## Usage
 
 ```sh
-mdvim notes.md                        # open a file
-mdvim -O a.md b.md                    # vertical splits (-o horizontal, -p tabs)
-mdvim +42 notes.md                    # start at line 42
-mdvim --colorscheme kanagawa notes.md # pick a theme
+nib notes.md                        # open a file
+nib -O a.md b.md                    # vertical splits (-o horizontal, -p tabs)
+nib +42 notes.md                    # start at line 42
+nib --colorscheme kanagawa notes.md # pick a theme
 ```
 
 Inside the editor, `:help` lists the essentials, `:preview` toggles live
@@ -62,13 +62,13 @@ reveals every selected line.
 
 ### Heading sizes
 
-Headings shrink from H1 (2x) to H4 (1.25x), as in Obsidian. mdvim detects
+Headings shrink from H1 (2x) to H4 (1.25x), as in Obsidian. nib detects
 what your terminal can do at startup:
 
 | Terminal | Headings |
 |---|---|
 | kitty | real large text via the [text sizing protocol](https://sw.kovidgoyal.net/kitty/text-sizing-protocol/) |
-| Ghostty, WezTerm | rendered by mdvim and shown as images via the [graphics protocol](https://sw.kovidgoyal.net/kitty/graphics-protocol/) |
+| Ghostty, WezTerm | rendered by nib and shown as images via the [graphics protocol](https://sw.kovidgoyal.net/kitty/graphics-protocol/) |
 | everything else | normal size, set apart by colour and weight |
 
 In Ghostty the headings use your `font-family` settings, or Ghostty's
@@ -110,7 +110,7 @@ To write your own, see [themes/README.md](themes/README.md).
 
 ## Configuration
 
-mdvim reads `~/.config/mdvim/config.toml`. Every key is optional; see
+nib reads `~/.config/nib/config.toml`. Every key is optional; see
 [examples/config.toml](examples/config.toml) for all of them.
 
 ```toml
@@ -128,7 +128,7 @@ textwidth = 80
 link = { fg = "cyan", underline = true }
 ```
 
-Run `mdvim -u NONE` to start without a config.
+Run `nib -u NONE` to start without a config.
 
 ## Vim support
 

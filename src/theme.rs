@@ -6,7 +6,7 @@
 //! accent, heading colours, …) is mapped onto all highlight groups, and the
 //! scheme paints its own background. Schemes are TOML files — the built-in ones
 //! live in `themes/` and are compiled in; users can add their own (or override a
-//! built-in) in `~/.config/mdvim/themes/NAME.toml`. Individual groups can still
+//! built-in) in `~/.config/nib/themes/NAME.toml`. Individual groups can still
 //! be overridden in config.toml under `[theme]`.
 
 use std::collections::HashMap;
@@ -363,14 +363,14 @@ const ALIASES: &[(&str, &str)] = &[
     ("gruvbox-dark", "gruvbox"),
 ];
 
-/// Directory for user colour schemes: `~/.config/mdvim/themes`.
+/// Directory for user colour schemes: `~/.config/nib/themes`.
 pub fn user_dir() -> Option<PathBuf> {
-    dirs::config_dir().map(|d| d.join("mdvim").join("themes"))
+    dirs::config_dir().map(|d| d.join("nib").join("themes"))
 }
 
-/// Where `:colorscheme` remembers the last choice: `~/.local/state/mdvim/colorscheme`.
+/// Where `:colorscheme` remembers the last choice: `~/.local/state/nib/colorscheme`.
 pub fn saved_path() -> Option<PathBuf> {
-    dirs::state_dir().or_else(dirs::data_dir).map(|d| d.join("mdvim").join("colorscheme"))
+    dirs::state_dir().or_else(dirs::data_dir).map(|d| d.join("nib").join("colorscheme"))
 }
 
 /// The remembered scheme and when it was chosen.
@@ -555,7 +555,7 @@ mod tests {
 
     #[test]
     fn user_scheme_extends_builtin() {
-        let dir = std::env::temp_dir().join(format!("mdvim-theme-test-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("nib-theme-test-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         // Shadows the built-in of the same name and extends it.
         std::fs::write(

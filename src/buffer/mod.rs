@@ -355,7 +355,7 @@ fn write_atomic(path: &Path, data: &[u8]) -> anyhow::Result<()> {
     }
     let dir = path.parent().filter(|p| !p.as_os_str().is_empty()).unwrap_or(Path::new("."));
     let name = path.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
-    let tmp = dir.join(format!(".{name}.mdvim-tmp-{}", std::process::id()));
+    let tmp = dir.join(format!(".{name}.nib-tmp-{}", std::process::id()));
     let res = (|| -> anyhow::Result<()> {
         let mut f = fs::File::create(&tmp)?;
         f.write_all(data)?;

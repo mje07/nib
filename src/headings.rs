@@ -329,7 +329,7 @@ pub struct HeadingImages {
 impl HeadingImages {
     /// Set up image headings if the terminal supports kitty graphics.
     pub fn detect() -> Option<HeadingImages> {
-        if std::env::var_os("MDVIM_NO_HEADING_IMAGES").is_some() {
+        if std::env::var_os("NIB_NO_HEADING_IMAGES").is_some() {
             return None;
         }
         let p = probe();

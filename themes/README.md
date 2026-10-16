@@ -1,6 +1,6 @@
 # Writing a colour scheme
 
-A scheme is a TOML file. Put yours in `~/.config/mdvim/themes/NAME.toml` and
+A scheme is a TOML file. Put yours in `~/.config/nib/themes/NAME.toml` and
 load it with `:colorscheme NAME` (a path to any `.toml` file also works). A
 file with the same name as a built-in replaces it. Every file in this
 directory is a built-in written in the same format, so copy one to start.

@@ -31,7 +31,7 @@ use ui::CursorShape;
 
 /// A vim-style terminal editor with Obsidian-like live markdown preview.
 #[derive(Parser, Debug)]
-#[command(name = "mdvim", version, about)]
+#[command(name = "nib", version, about)]
 struct Cli {
     /// Files to edit
     files: Vec<PathBuf>,
@@ -83,13 +83,13 @@ fn main() {
     let cli = Cli::parse_from(args);
     if let Some(path) = &cli.dump_render {
         if let Err(e) = dump_render(path, cli.width, cli.cursor, cli.ansi, cli.colorscheme.as_deref()) {
-            eprintln!("mdvim: {e}");
+            eprintln!("nib: {e}");
             std::process::exit(1);
         }
         return;
     }
     if let Err(e) = run(cli, goto) {
-        eprintln!("mdvim: {e}");
+        eprintln!("nib: {e}");
         std::process::exit(1);
     }
 }
@@ -361,7 +361,7 @@ fn draw_frame(term: &mut Terminal<CrosstermBackend<io::Stdout>>, ed: &Editor) ->
 fn detect_text_sizing() -> bool {
     use ratatui::crossterm::cursor::{MoveTo, position};
     let mut out = io::stdout();
-    if std::env::var_os("MDVIM_NO_TEXT_SIZING").is_some() {
+    if std::env::var_os("NIB_NO_TEXT_SIZING").is_some() {
         return false;
     }
     let mut probe = || -> io::Result<bool> {

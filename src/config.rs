@@ -1,4 +1,4 @@
-//! `~/.config/mdvim/config.toml` loading.
+//! `~/.config/nib/config.toml` loading.
 
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -13,7 +13,7 @@ use crate::theme::StyleSpec;
 #[serde(deny_unknown_fields)]
 pub struct ConfigFile {
     pub leader: Option<String>,
-    /// Colour scheme: a built-in name or a file in ~/.config/mdvim/themes.
+    /// Colour scheme: a built-in name or a file in ~/.config/nib/themes.
     pub colorscheme: Option<String>,
     #[serde(default)]
     pub options: HashMap<String, toml::Value>,
@@ -37,7 +37,7 @@ pub struct Keymaps {
 }
 
 pub fn default_path() -> Option<PathBuf> {
-    dirs::config_dir().map(|d| d.join("mdvim").join("config.toml"))
+    dirs::config_dir().map(|d| d.join("nib").join("config.toml"))
 }
 
 /// Load and apply the config. Returns a list of non-fatal problems.
@@ -128,7 +128,7 @@ mod tests {
 
     #[test]
     fn colorscheme_is_remembered() {
-        let path = std::env::temp_dir().join(format!("mdvim-colo-test-{}", std::process::id())).join("colorscheme");
+        let path = std::env::temp_dir().join(format!("nib-colo-test-{}", std::process::id())).join("colorscheme");
         let mut ed = Editor::new(80, 24);
         ed.colorscheme_file = Some(path.clone());
         ed.run_ex("colorscheme rose-pine").unwrap();

@@ -1,7 +1,11 @@
 [package]
-name = "mdvim"
+name = "nib-editor"
 version = "0.1.0"
 edition = "2024"
+
+[[bin]]
+name = "nib"
+path = "src/main.rs"
 
 [dependencies]
 anyhow = "1.0.104"

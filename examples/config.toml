@@ -1,5 +1,5 @@
-# mdvim configuration — copy to ~/.config/mdvim/config.toml
-# Every key is optional. Run mdvim with `-u NONE` to ignore the config.
+# nib configuration — copy to ~/.config/nib/config.toml
+# Every key is optional. Run nib with `-u NONE` to ignore the config.
 
 # Key used for <leader> in mappings (default: space).
 leader = " "
@@ -10,7 +10,7 @@ leader = " "
 #   tokyonight-moon, tokyonight-day, catppuccin-mocha, catppuccin-macchiato,
 #   catppuccin-frappe, catppuccin-latte, rose-pine, rose-pine-moon,
 #   rose-pine-dawn, gruvbox, gruvbox-light, nord, dracula, everforest
-# or the name of your own scheme in ~/.config/mdvim/themes/NAME.toml.
+# or the name of your own scheme in ~/.config/nib/themes/NAME.toml.
 colorscheme = "tokyonight"
 
 [options]
