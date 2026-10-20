@@ -654,19 +654,20 @@ fn scaled_headings_layout() {
 fn readable_line_length() {
     let mut e = ed("x");
     e.resize(120, 24);
+    feed(&mut e, ":set nonu<CR>");
     // Narrower than the window: a centred column.
     let tr = e.text_rect(e.win_id());
-    assert_eq!((tr.x, tr.w), (20, 80));
+    assert_eq!((tr.x, tr.w), (15, 90));
     feed(&mut e, " >");
-    assert_eq!(e.options.wrapwidth, 84);
+    assert_eq!(e.options.wrapwidth, 94);
     feed(&mut e, " < <");
-    assert_eq!(e.options.wrapwidth, 76);
+    assert_eq!(e.options.wrapwidth, 86);
     // Toggle off (window edge) and back on to the same width.
     feed(&mut e, " w");
     assert_eq!(e.options.wrapwidth, 0);
     assert_eq!(e.text_rect(e.win_id()).w, 120);
     feed(&mut e, " w");
-    assert_eq!(e.options.wrapwidth, 76);
+    assert_eq!(e.options.wrapwidth, 86);
     // Widening stops at the window edge; there is a sensible minimum.
     feed(&mut e, ":wrapwidth 500<CR>");
     assert_eq!(e.text_rect(e.win_id()).w, 120);

@@ -452,7 +452,7 @@ fn dump_render(path: &PathBuf, width: u16, cursor: Option<usize>, ansi: bool, co
             line.push_str("\x1b[0m");
         }
         let plain = line.trim_end().to_string();
-        if !plain.starts_with('~') {
+        if !plain.is_empty() {
             last_nonempty = lines.len() + 1;
         }
         lines.push(if ansi { line } else { plain });

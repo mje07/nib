@@ -510,10 +510,6 @@ fn draw_window(ed: &Editor, buf: &mut TBuf, id: WinId, r: Rect, overlays: &mut V
             y += 1;
         }
     }
-    while y < tr.y + tr.h {
-        put(buf, gx, y, "~", theme.get("nontext"), r.w - (gx - r.x));
-        y += 1;
-    }
     draw_statusline(ed, buf, id, r, active);
     cursor
 }

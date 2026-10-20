@@ -219,7 +219,7 @@ impl Editor {
             theme_overrides: Vec::new(),
             colorscheme_file: None,
             config_colorscheme: false,
-            last_wrapwidth: 80,
+            last_wrapwidth: 90,
             leader: " ".into(),
             keymaps: Keymaps::default(),
             registers: Registers::default(),

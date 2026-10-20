@@ -42,12 +42,12 @@ pub struct Options {
 impl Default for Options {
     fn default() -> Self {
         Options {
-            number: false,
+            number: true,
             relativenumber: false,
             wrap: true,
             linebreak: true,
             breakindent: true,
-            wrapwidth: 80,
+            wrapwidth: 90,
             tabstop: 4,
             shiftwidth: 4,
             expandtab: true,

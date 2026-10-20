@@ -64,7 +64,7 @@ reveals every selected line.
 
 ### Wrapping
 
-Long lines wrap at word boundaries in a centred column 80 characters wide,
+Long lines wrap at word boundaries in a centred column 90 characters wide,
 like Obsidian's readable line length. Wrapped list items, tasks and indented
 text hang under their own text, and quote bars run down the side.
 
