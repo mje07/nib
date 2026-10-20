@@ -103,6 +103,7 @@ const CMDS: &[(&str, usize)] = &[
     ("vnoremap", 2),
     ("vunmap", 2),
     ("vertical", 4),
+    ("wrapwidth", 5),
     ("write", 1),
     ("wq", 2),
     ("wall", 2),
@@ -141,6 +142,7 @@ nib — vim-style editor with live markdown preview
   Windows: Ctrl-w s/v/w/h/j/k/l/q/o/=/+/-/</>  Tabs: gt gT :tabnew
   Folds (markdown headings): za zc zo zR zM   Links: gx (open URL) gf (open file)
   Markdown: <leader>x toggles a task; Enter continues lists; Tab/S-Tab indent items
+  Wrapping: <leader>w toggles readable line length; <leader>> <leader>< widen/narrow it; :wrapwidth {N}
   :preview toggles live preview for the window; :set nopreview disables it globally
   :colorscheme {name} switches theme and remembers it (Tab lists them); :colorscheme shows the current one
   Ex: :w :q :x :e :s :g :v :norm :sort :m :t :d :y :pu :j :> :< :! :r :set :map :ls :b :reg :marks";
@@ -865,6 +867,7 @@ impl Editor {
                 self.set_cursor(Pos::new(l1, c));
                 Ok(())
             }
+            "wrapwidth" => self.wrap_width_cmd(&args),
             "pwd" => {
                 let d = std::env::current_dir().map_err(|e| e.to_string())?;
                 self.info(d.display().to_string());
@@ -1219,6 +1222,42 @@ impl Editor {
                 }
             }
         }
+    }
+
+    /// `:wrapwidth` toggles readable line length, `:wrapwidth {N}` sets it and
+    /// `:wrapwidth +N` / `-N` widen or narrow the text column.
+    fn wrap_width_cmd(&mut self, args: &str) -> R {
+        const MIN: usize = 20;
+        let id = self.win_id();
+        let r = self.window_rect(id);
+        let full = (r.w as usize).saturating_sub(self.gutter_width(self.windows[&id].buf));
+        let cur = self.options.wrapwidth;
+        // Off, or wider than the window: the text currently spans the window.
+        let shown = if cur == 0 || cur > full { full } else { cur };
+        let new = if args.is_empty() {
+            if cur > 0 {
+                self.last_wrapwidth = cur;
+                0
+            } else {
+                self.last_wrapwidth.max(MIN)
+            }
+        } else if let Some(n) = args.strip_prefix('+') {
+            let n: usize = n.trim().parse().map_err(|_| format!("E521: Number required: {args}"))?;
+            (shown + n).min(full).max(MIN)
+        } else if let Some(n) = args.strip_prefix('-') {
+            let n: usize = n.trim().parse().map_err(|_| format!("E521: Number required: {args}"))?;
+            shown.saturating_sub(n).max(MIN)
+        } else {
+            let n: usize = args.parse().map_err(|_| format!("E521: Number required: {args}"))?;
+            if n == 0 { 0 } else { n.max(MIN) }
+        };
+        self.options.wrapwidth = new;
+        if new > 0 {
+            self.options.wrap = true;
+            self.last_wrapwidth = new;
+        }
+        self.info(if new == 0 { "Wrapping at the window edge".to_string() } else { format!("Wrapping at {new} columns") });
+        Ok(())
     }
 
     fn set_options(&mut self, args: &str, local: bool) -> R {

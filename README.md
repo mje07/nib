@@ -12,6 +12,8 @@ plain modal vim.
 
 - **Live preview** that keeps one source line per display line, so line
   numbers, counts and ranges behave exactly like vim
+- **Readable line length**: text wraps in a centred column, as in Obsidian,
+  and you can widen or narrow it as you write
 - **Large headings** in kitty, and in Ghostty and WezTerm, drawn in your
   terminal's own font
 - **22 colour schemes** including Kanagawa, Tokyo Night, Catppuccin and
@@ -60,6 +62,21 @@ preview for the window, and `:colorscheme` switches themes.
 A cursor in a table or code block reveals the whole block. Visual mode
 reveals every selected line.
 
+### Wrapping
+
+Long lines wrap at word boundaries in a centred column 80 characters wide,
+like Obsidian's readable line length. Wrapped list items, tasks and indented
+text hang under their own text, and quote bars run down the side.
+
+| Key | Does |
+|---|---|
+| `<leader>w` | toggle between the column and the full window width |
+| `<leader>>` / `<leader><` | widen / narrow the column by 4 |
+| `:wrapwidth 100` | set the width (`:set wrapwidth=0` wraps at the window edge) |
+
+`:set nobreakindent` turns off the hanging indent, and `:set nowrap` turns
+wrapping off altogether.
+
 ### Heading sizes
 
 Headings shrink from H1 (2x) to H4 (1.25x), as in Obsidian. nib detects
@@ -80,6 +97,7 @@ built-in JetBrains Mono when none is set. Turn sizing off with
 - `Enter` and `o` continue lists, numbered lists, tasks and quotes
 - `Tab` / `Shift-Tab` in insert mode indent and outdent list items
 - `<leader>x` toggles a task (leader is space)
+- `<leader>w` toggles readable line length; `<leader>>` / `<leader><` resize it
 - `za` `zc` `zo` `zR` `zM` fold heading sections; `]]` `[[` jump between them
 - `gf` opens a linked file, `gx` opens a URL
 - `gq` reflows text to `textwidth`, keeping list indentation

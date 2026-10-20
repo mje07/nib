@@ -211,13 +211,14 @@ fn table_row(doc: &MdDoc, t: usize, line: usize, tabstop: usize) -> RenderedLine
     RenderedLine { cells, fill: None }
 }
 
-/// Split cells into rows of at most `width` columns. With `linebreak`, rows
-/// break after whitespace when possible. Returns cell index ranges.
-pub fn wrap(cells: &[Cell], width: usize, linebreak: bool) -> Vec<Range<usize>> {
-    let width = width.max(1);
+/// Split cells into rows of at most `width` columns, rows after the first
+/// losing `indent` columns to a hanging indent. With `linebreak`, rows break
+/// after whitespace when possible. Returns cell index ranges.
+pub fn wrap(cells: &[Cell], width: usize, indent: usize, linebreak: bool) -> Vec<Range<usize>> {
     let mut rows = Vec::new();
     let mut start = 0;
     while start < cells.len() {
+        let width = if rows.is_empty() { width } else { width.saturating_sub(indent) }.max(1);
         let mut w = 0;
         let mut end = start;
         while end < cells.len() && w + cells[end].width as usize <= width {
@@ -312,7 +313,12 @@ mod tests {
     #[test]
     fn wrapping() {
         let r = plain("hello world foo", 4);
-        let rows = wrap(&r.cells, 8, true);
+        let rows = wrap(&r.cells, 8, 0, true);
         assert_eq!(rows, vec![0..6, 6..12, 12..15]);
+        let rows = wrap(&r.cells, 8, 2, true);
+        assert_eq!(rows, vec![0..6, 6..12, 12..15]);
+        let r = plain("- aaa bbb ccc", 4);
+        let rows = wrap(&r.cells, 8, 2, true);
+        assert_eq!(rows, vec![0..6, 6..10, 10..13]);
     }
 }

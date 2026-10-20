@@ -649,3 +649,61 @@ fn scaled_headings_layout() {
     assert_eq!(views[0].rl.cells.iter().map(|c| c.ch).collect::<String>(), "Big");
     assert_eq!(views[0].height(), 1);
 }
+
+#[test]
+fn readable_line_length() {
+    let mut e = ed("x");
+    e.resize(120, 24);
+    // Narrower than the window: a centred column.
+    let tr = e.text_rect(e.win_id());
+    assert_eq!((tr.x, tr.w), (20, 80));
+    feed(&mut e, " >");
+    assert_eq!(e.options.wrapwidth, 84);
+    feed(&mut e, " < <");
+    assert_eq!(e.options.wrapwidth, 76);
+    // Toggle off (window edge) and back on to the same width.
+    feed(&mut e, " w");
+    assert_eq!(e.options.wrapwidth, 0);
+    assert_eq!(e.text_rect(e.win_id()).w, 120);
+    feed(&mut e, " w");
+    assert_eq!(e.options.wrapwidth, 76);
+    // Widening stops at the window edge; there is a sensible minimum.
+    feed(&mut e, ":wrapwidth 500<CR>");
+    assert_eq!(e.text_rect(e.win_id()).w, 120);
+    feed(&mut e, ":wrapwidth +4<CR>");
+    assert_eq!(e.options.wrapwidth, 120);
+    feed(&mut e, ":wrapwidth 3<CR>");
+    assert_eq!(e.options.wrapwidth, 20);
+    // A count before the keybind is not mistaken for a range near the end.
+    feed(&mut e, "3 >");
+    assert_eq!(e.options.wrapwidth, 24);
+    // No readable width without wrapping.
+    feed(&mut e, ":set nowrap<CR>");
+    assert_eq!(e.text_rect(e.win_id()).w, 120);
+}
+
+#[test]
+fn wrapped_rows_hang_under_the_text() {
+    let words = "word ".repeat(12);
+    let mut e = md(&format!("- [ ] {words}\n> {words}\n  {words}\n{words}\n"));
+    feed(&mut e, ":wrapwidth 30<CR>G");
+    let views = e.layout_window(e.win_id());
+    let indent = |i: usize| views[i].indent.iter().map(|c| c.ch).collect::<String>();
+    assert_eq!(indent(0), "  ", "under the task text, past the checkbox");
+    assert_eq!(indent(1), "▎ ", "quote bar carries on");
+    assert_eq!(indent(2), "  ");
+    assert_eq!(indent(3), "");
+    assert!(views[0].rows.len() > 1);
+    // Cursor and clicks on a continuation row account for the indent.
+    let lv = &views[0];
+    let col = lv.rl.cells[lv.rows[1].start].src.unwrap();
+    assert_eq!(Editor::locate_col(lv, col), (1, 2));
+    assert_eq!(Editor::col_at(lv, 1, 2), col);
+    assert_eq!(Editor::col_at(lv, 1, 0), col, "clicking the indent lands on the text");
+    // Raw source (the cursor line) hangs under the text after `- [ ] `.
+    feed(&mut e, "gg");
+    let views = e.layout_window(e.win_id());
+    assert_eq!(views[0].indent.len(), 6);
+    feed(&mut e, ":set nobreakindent<CR>");
+    assert!(e.layout_window(e.win_id())[0].indent.is_empty());
+}

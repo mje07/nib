@@ -18,6 +18,8 @@ number = true
 relativenumber = false
 wrap = true             # soft-wrap long lines
 linebreak = true        # wrap at word boundaries
+wrapwidth = 80          # readable line length: centred column (0 = window edge)
+breakindent = true      # wrapped list items and quotes hang under their text
 tabstop = 4
 shiftwidth = 4
 expandtab = true

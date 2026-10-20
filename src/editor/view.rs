@@ -12,6 +12,8 @@ pub struct LineView {
     pub line: usize,
     pub rl: RenderedLine,
     pub rows: Vec<Range<usize>>,
+    /// Hanging indent drawn before every wrapped row after the first.
+    pub indent: Vec<Cell>,
     /// Last line of a closed fold starting here.
     pub fold_end: Option<usize>,
     pub raw: bool,
@@ -60,6 +62,53 @@ impl LineView {
     pub fn row_at(&self, rel: usize) -> usize {
         (rel / self.row_h()).min(self.rows.len().saturating_sub(1))
     }
+
+    /// Display x where the text of wrapped row `row` starts.
+    pub fn row_x(&self, row: usize) -> usize {
+        if row == 0 { 0 } else { self.indent.iter().map(|c| c.width as usize).sum() }
+    }
+}
+
+/// Char column where the text of `s` starts after leading whitespace and,
+/// in markdown, quote markers, a list marker and a task box.
+fn text_start(s: &str, markdown: bool) -> usize {
+    let c: Vec<char> = s.chars().collect();
+    let blank = |i: &mut usize| {
+        while *i < c.len() && (c[*i] == ' ' || c[*i] == '\t') {
+            *i += 1;
+        }
+    };
+    let mut i = 0;
+    blank(&mut i);
+    if !markdown {
+        return i;
+    }
+    while i < c.len() && c[i] == '>' {
+        i += 1;
+        blank(&mut i);
+    }
+    let mut j = i;
+    if j < c.len() && matches!(c[j], '-' | '*' | '+') {
+        j += 1;
+    } else {
+        while j < c.len() && j - i < 9 && c[j].is_ascii_digit() {
+            j += 1;
+        }
+        if j == i || j >= c.len() || !matches!(c[j], '.' | ')') {
+            return i;
+        }
+        j += 1;
+    }
+    // A marker needs a space after it (or nothing: an empty item).
+    if j < c.len() && c[j] != ' ' && c[j] != '\t' {
+        return i;
+    }
+    blank(&mut j);
+    if c.len() >= j + 3 && c[j] == '[' && c[j + 2] == ']' && (c.len() == j + 3 || c[j + 3] == ' ') {
+        j += 3;
+        blank(&mut j);
+    }
+    j
 }
 
 pub const FOLD_FLAG: u32 = 1 << 23;
@@ -183,19 +232,47 @@ impl Editor {
             let scale = self.heading_scale(buf, line, mode, &rl);
             let mut rows = std::iter::once(0..rl.cells.len()).collect::<Vec<_>>();
             if self.options.wrap {
-                rows = wrap(&rl.cells, Self::wrap_width(width, scale), self.options.linebreak);
+                rows = wrap(&rl.cells, Self::wrap_width(width, scale), 0, self.options.linebreak);
                 rows.truncate(1);
             }
-            return LineView { line, rl, rows, fold_end: Some(e), raw: mode != RenderMode::Preview, scale };
+            let indent = Vec::new();
+            return LineView { line, rl, rows, indent, fold_end: Some(e), raw: mode != RenderMode::Preview, scale };
         }
         let rl = self.render_buf_line(buf, line, mode);
         let scale = self.heading_scale(buf, line, mode, &rl);
-        let rows = if self.options.wrap {
-            wrap(&rl.cells, Self::wrap_width(width, scale), self.options.linebreak)
+        let (rows, indent) = if self.options.wrap {
+            let w = Self::wrap_width(width, scale);
+            let indent = if scale.is_none() { self.break_indent(buf, line, &rl, w) } else { Vec::new() };
+            let iw = indent.iter().map(|c| c.width as usize).sum();
+            (wrap(&rl.cells, w, iw, self.options.linebreak), indent)
         } else {
-            std::iter::once(0..rl.cells.len()).collect()
+            (std::iter::once(0..rl.cells.len()).collect(), Vec::new())
         };
-        LineView { line, rl, rows, fold_end: None, raw: mode != RenderMode::Preview, scale }
+        LineView { line, rl, rows, indent, fold_end: None, raw: mode != RenderMode::Preview, scale }
+    }
+
+    /// Hanging indent for wrapped rows, Obsidian style: continuation rows
+    /// line up with the text after any indent, list marker or task box, and
+    /// quote bars carry on down the side.
+    fn break_indent(&self, buf: &Buffer, line: usize, rl: &RenderedLine, width: usize) -> Vec<Cell> {
+        use crate::markdown::flags::{CODEBLOCK, QUOTE, QUOTEBAR};
+        if !self.options.breakindent {
+            return Vec::new();
+        }
+        let start = text_start(&buf.line(line), buf.is_markdown());
+        let n = rl.cells.iter().position(|c| c.src.is_some_and(|s| s >= start)).unwrap_or(rl.cells.len());
+        let indent: Vec<Cell> = rl.cells[..n]
+            .iter()
+            .map(|c| Cell {
+                ch: if c.flags & QUOTEBAR != 0 { c.ch } else { ' ' },
+                width: c.width,
+                flags: c.flags & (CODEBLOCK | QUOTE | QUOTEBAR),
+                src: None,
+            })
+            .collect();
+        // Too deep an indent would leave no room for the text.
+        let iw: usize = indent.iter().map(|c| c.width as usize).sum();
+        if iw * 2 > width { Vec::new() } else { indent }
     }
 
     /// Width in normal-size cells available to a (possibly scaled) row.
@@ -255,7 +332,7 @@ impl Editor {
         for (r, range) in lv.rows.iter().enumerate() {
             if idx < range.end || (r + 1 == lv.rows.len()) {
                 let x: usize = cells[range.start..idx.max(range.start).min(range.end)].iter().map(|c| c.width as usize).sum();
-                return (r, x);
+                return (r, lv.row_x(r) + x);
             }
         }
         (0, 0)
@@ -267,6 +344,7 @@ impl Editor {
         let Some(range) = lv.rows.get(row) else {
             return cells.iter().rev().find_map(|c| c.src).map(|s| s + 1).unwrap_or(0);
         };
+        let x = x.saturating_sub(lv.row_x(row));
         let mut acc = 0;
         let mut last_src = None;
         for c in &cells[range.clone()] {

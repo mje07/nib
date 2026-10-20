@@ -360,6 +360,8 @@ fn draw_window(ed: &Editor, buf: &mut TBuf, id: WinId, r: Rect, overlays: &mut V
     let b = &ed.buffers[&win.buf];
     let tr = ed.text_rect(id);
     let g = ed.gutter_width(win.buf) as u16;
+    // The gutter sits just left of the text, which may be a centred column.
+    let gx = tr.x.saturating_sub(g).max(r.x);
     let active = id == ed.win_id();
     let views = ed.layout_window(id);
     let hl = ed.highlight_regex();
@@ -413,7 +415,7 @@ fn draw_window(ed: &Editor, buf: &mut TBuf, id: WinId, r: Rect, overlays: &mut V
                     format!("{:>width$} ", lv.line + 1, width = g as usize - 1)
                 };
                 let st = if is_cursor_line { theme.get("cursorlinenr") } else { theme.get("linenr") };
-                put(buf, r.x, y, &num, st, g);
+                put(buf, gx, y, &num, st, g);
             }
             if let Some(sc) = lv.scale
                 && y + sc.s as u16 <= tr.y + tr.h
@@ -429,6 +431,13 @@ fn draw_window(ed: &Editor, buf: &mut TBuf, id: WinId, r: Rect, overlays: &mut V
                 continue;
             }
             let mut x = 0usize;
+            if ri > 0 {
+                for c in &lv.indent {
+                    let st = base.patch(*cache.entry(c.flags).or_insert_with(|| md_style(theme, c.flags)));
+                    put(buf, tr.x + x as u16, y, &c.ch.to_string(), st, c.width as u16);
+                    x += c.width as usize;
+                }
+            }
             let mut last_src = None;
             let cells = &lv.rl.cells[row.clone()];
             let mut skip = if ed.options.wrap { 0 } else { win.leftcol };
@@ -502,7 +511,7 @@ fn draw_window(ed: &Editor, buf: &mut TBuf, id: WinId, r: Rect, overlays: &mut V
         }
     }
     while y < tr.y + tr.h {
-        put(buf, r.x, y, "~", theme.get("nontext"), r.w);
+        put(buf, gx, y, "~", theme.get("nontext"), r.w - (gx - r.x));
         y += 1;
     }
     draw_statusline(ed, buf, id, r, active);

@@ -165,6 +165,8 @@ pub struct Editor {
     pub colorscheme_file: Option<std::path::PathBuf>,
     /// The config file sets `colorscheme`.
     pub config_colorscheme: bool,
+    /// Width `:wrapwidth` restores when readable line length is toggled back on.
+    pub last_wrapwidth: usize,
     pub leader: String,
     pub keymaps: Keymaps,
     pub registers: Registers,
@@ -217,6 +219,7 @@ impl Editor {
             theme_overrides: Vec::new(),
             colorscheme_file: None,
             config_colorscheme: false,
+            last_wrapwidth: 80,
             leader: " ".into(),
             keymaps: Keymaps::default(),
             registers: Registers::default(),
@@ -259,6 +262,9 @@ impl Editor {
         let leader = self.leader.clone();
         self.keymaps.add(MapMode::Normal, "<leader>x", ":task<CR>", true, &leader);
         self.keymaps.add(MapMode::Visual, "<leader>x", ":task<CR>", true, &leader);
+        self.keymaps.add(MapMode::Normal, "<leader>w", ":<C-u>wrapwidth<CR>", true, &leader);
+        self.keymaps.add(MapMode::Normal, "<leader>>", ":<C-u>wrapwidth +4<CR>", true, &leader);
+        self.keymaps.add(MapMode::Normal, "<leader><lt>", ":<C-u>wrapwidth -4<CR>", true, &leader);
     }
 
     // --- Buffers & windows ---------------------------------------------------
@@ -688,7 +694,14 @@ impl Editor {
     pub fn text_rect(&self, id: WinId) -> Rect {
         let r = self.window_rect(id);
         let g = self.gutter_width(self.windows[&id].buf) as u16;
-        Rect::new(r.x + g.min(r.w), r.y, r.w.saturating_sub(g), r.h.saturating_sub(1))
+        let mut tr = Rect::new(r.x + g.min(r.w), r.y, r.w.saturating_sub(g), r.h.saturating_sub(1));
+        // Readable line length: a centred column, with the gutter beside it.
+        let ww = self.options.wrapwidth.min(u16::MAX as usize) as u16;
+        if self.options.wrap && ww > 0 && tr.w > ww {
+            tr.x = r.x + ((r.w - ww) / 2).max(g);
+            tr.w = ww;
+        }
+        tr
     }
 
     pub fn gutter_width(&self, buf: BufId) -> usize {
